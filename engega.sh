@@ -13,11 +13,13 @@ szOUT="==== [`date -R`] === ($0) === start node PHOTO SERVER. user($USER) host($
 echo $szOUT                                                                >> $fTZ
 
 ipEXT=$(curl -s icanhazip.com);
-szIP="[`date -R`] external IP is {$ipEXT}. External port 9009, internal 8081."
+szIP="[`date -R`] external IP is {$ipEXT}. External port 8815, internal 2415/8080."
 echo $szIP                                                              >> $fTZ
 
-sudo    /usr/bin/node /home/sag/express-sendfile/server.js              >> $fTZ  2>&1      &
+# si ve de /etc/rc.local ja es ROOT
+/usr/bin/node /home/sag/express-sendfile/server.js              >> $fTZ  2>&1      &
 rv=$?
+
 echo "node photo server rc is ("$rv")."                                 >> $fTZ
 ps -ef | grep node | grep   -v grep                                     >> $fTZ
 

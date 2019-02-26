@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ `id -u`  -ne 0 ]
+then
+    echo "--- Must be running as root"
+    exit 1
+fi
+
 echo "+++ abans"
 ps -ef | grep node | grep   -v grep   
 
