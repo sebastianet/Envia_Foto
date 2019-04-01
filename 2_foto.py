@@ -22,7 +22,7 @@ timestr = time.strftime("%Y%m%d_%H%M%S")
 szShortFN = 'webcam_' + timestr + '.png' 
 # print 'Filename (' + szShortFN + ').'
 
-szFN = '/home/pi/semafor/public/images/webcam/' + szShortFN 
+szFN = '/home/sag/express-sendfile/public/imatges/webcam/' + szShortFN 
 # print 'Large Filename (' + szFN + ').'
 
 # print '>>> do VideoCapture()'

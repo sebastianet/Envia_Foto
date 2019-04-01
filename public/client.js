@@ -19,23 +19,39 @@ Date.prototype.hhmmss = function () {
 	return myHHMMSS ;
 } ; // hhmmss
 
-// === que fem quan es pica el link de "fer foto" :
+// get a timestamp
+function genTimeStamp ( arg ) {
 
+    var szOut = (new Date).yyyymmdd() + ' - ' + (new Date).hhmmss() ;
+    return szOut ;
+
+} ; // genTimeStamp()
+
+
+// === que fem quan es pica el link de "fer foto" :
 $( ".clkFerFoto" ).click( function() {
     $.get( '/fem_foto', function( page ) {
-        console.log( '*** [' + (new Date).yyyymmdd() +', '+ (new Date).hhmmss() + '] index - demanem al server la sub-pagina FER_FOTO' ) ;
+        console.log( '*** [' + genTimeStamp() + '] index - demanem al server la sub-pagina FER_FOTO' ) ;
         $( "#id_photo" ).html( page ) ; // show received HTML at specific <div>
     }) ; // get()
 }) ; // clkFerFoto
+
+// === que fem quan es pica el link de "foto seq" :
+$( ".clkFotoSeq" ).click( function() {
+    $.get( '/foto_seq.html', function( page ) {
+        console.log( '*** [' + genTimeStamp() + '] index - demanem al server la sub-pagina FOTO_SEQ' ) ;
+        $( "#id_photo" ).html( page ) ; // show received HTML at specific <div>
+    }) ; // get()
+}) ; // clkFotoSeq
 
 // ===
 
 function index_ready() {              // DOM ready for index.htm
 
-    console.log( '*** index DOM ready.' ) ;
+    console.log( '*** (' + genTimeStamp() + ') *** index DOM ready.' ) ;
 
 // posar la data actual a dalt al mig - aixi diferenciem re-loads
-    var szAra = '<center>./public/index.html - now is [' + (new Date).yyyymmdd() +', '+ (new Date).hhmmss() + ']</center>' ;
+    var szAra = '<center>./public/index.html - now is [' + genTimeStamp() + ']</center>' ;
     $( "#id_date" ).html( szAra ) ; // show actual date
 
 } ; // index_ready(), DOM ready for INDEX.HTM

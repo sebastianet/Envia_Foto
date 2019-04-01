@@ -36,3 +36,10 @@ H1, H2, H3, H4 {
      border: 1px solid blue ;
      background-color: white ;
  }
+
+.img_brd {
+     border: 1px solid red ;
+     padding: 5px ;
+     margin-left: 10px ;
+     background-color: green ;
+ }
