@@ -6,6 +6,10 @@
 //     https://github.com/extrabacon/python-shell
 //     https://www.npmjs.com/package/python-shell
 //
+// git commands :
+//     git commit -am "version description"
+//     git push
+//
 // Versions :
 //  1.1.a 20190216 - inici
 //  1.1.b          - posar rpi-gpio : npm install rpi-gpio --save
@@ -20,8 +24,10 @@
 //  1.1.i          - use small image
 //  1.1.j          - try to catch python error
 //  1.1.k          - display 5 images 320x240
+//  1.1.l          - timestamp images on 2nd row
+//  1.1.m          - timestamp images on 2nd row properly
 
-var myVersion  = "1.1.k" ;
+var myVersion  = "1.1.m" ;
 var png_File   = '/home/sag/express-sendfile/public/imatges/webcam/fwc.png' ;  // created by python
 var Detalls = 1 ;                                                                  // control de la trassa que generem via "mConsole"
 

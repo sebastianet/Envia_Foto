@@ -1,10 +1,10 @@
 
 // nova funcio yymmdd de Date() - at client
 Date.prototype.yyyymmdd = function () {                            
-	var yyyy = this.getFullYear().toString();                                    
-	var mm   = (this.getMonth()+1).toString(); // getMonth() is zero-based         
-	var dd   = this.getDate().toString();
-	return yyyy + '/' + (mm[1]?mm:"0"+mm[0]) + '/' + (dd[1]?dd:"0"+dd[0]);
+	var yyyy = this.getFullYear().toString() ;                                    
+	var mm   = (this.getMonth()+1).toString() ; // getMonth() is zero-based         
+	var dd   = this.getDate().toString() ;
+	return yyyy + '/' + (mm[1]?mm:"0"+mm[0]) + '/' + (dd[1]?dd:"0"+dd[0]) ;
 } ; // yyyymmd
 
 Date.prototype.hhmmss = function () {
@@ -45,7 +45,6 @@ $( ".clkFotoSeq" ).click( function() {
 }) ; // clkFotoSeq
 
 
-
 function MyTimeout( ) {
 var szLog ;
 
@@ -54,8 +53,11 @@ var szLog ;
     console.log( szLog ) ;
     // pendent : mirar timBusy
     timBusy = 1 ;
+
     $.getJSON( '/fes_photo_gimme_json', function( mi_json ) {
+
         // pendent : mirar mi_json.status
+
         cntPics = cntPics + 1 ;
         szLog = '+++ [' + genTimeStamp() + '] rebem JSON : q(' + mi_json.status + '), url (' + mi_json.imgURL + '). ' ;
         szLog += 'Cnt (' + cntPics + '). ' ;
@@ -63,18 +65,33 @@ var szLog ;
         console.log( szLog ) ;
 
         var szIdPutPic = '#idn_imatge_'+idxPics ;                                  // calculem el nom del lloc on posar la seguent imatge
-        console.log( ">>> sequencia imatges - ocupem la posicio (%s).", szIdPutPic );
+        console.log( ">>> sequencia imatges - ocupem posicio (%s).", szIdPutPic ) ;
 
         let randomStr = Math.random().toString(36).substr(2) ;                     // avoid html 304
         $( szIdPutPic ).attr( 'src', mi_json.imgURL+ '?random=' + randomStr ) ;    // request pic file and place it in page
 
+// lets timestamp the picture :
+
+        var szIdPicDate = '#idn_tmstmp_'+idxPics ;                                  // calculem el nom del lloc on posar el seguent texte
+        var szThisMoment = genTimeStamp() ;
+        console.log( ">>> sequencia imatges - marquem posicio (%s) amb (%s).", szIdPicDate, szThisMoment ) ;
+        $( szIdPicDate ).html( szThisMoment ) ;                                       // write timestamp in cell
+
+// let work with "next" item
+
         idxPics = idxPics + 1 ;
         if ( idxPics === maxPics ) { idxPics = 0 ; } ;
+
         var szIdClrPic = '#idn_imatge_'+idxPics ;                                  // calculem el nom del lloc on esborrar la imatge
         $( szIdClrPic ).attr( 'src', "imatges/webcam/webcam_320x240.png" ) ;       // request "empty" pic and place it in page
 
+        var szIdClrDate = '#idn_tmstmp_'+idxPics ;                                  // calculem el nom del lloc on posar el seguent texte
+        $( szIdClrDate ).html( '- - -' ) ;                                          // write timestamp in cell
+
         timBusy = 0 ;
-    }) ;
+
+    }) ; // getJSON()
+
 } ; // MyTimeout( )
 
 
@@ -86,15 +103,16 @@ $( ".clkStartFotoSeq" ).click( function() {
 
 $( ".clkStopFotoSeq" ).click( function() {
     console.log( '*** [' + genTimeStamp() + '] click Stop Timer' + ', id ' + myTimer ) ;
-    clearInterval(myTimer);
+    clearInterval(myTimer) ;
 }) ; // clkStopFotoSeq
 
 var myTimer = 0 ;
-let kSeconds = 20 ;
+let kSeconds = 30 ;
 let cntPics = 0 ;
-let maxPics = 5;
+
+let maxPics = 5 ;    // compte que index.htm ha de tenir els IDs corresponents !
 let idxPics = 0 ;
-let timBusy = 0 ;
+let timBusy = 0 ;    // intentem controlar el retard del servidor ...
 
 // let myid_imatge = document.getElementById('id_imatge')
 
@@ -113,6 +131,6 @@ function index_ready() {              // DOM ready for index.htm
 
 $( function() {
 	
-    index_ready(); // DOM ready event
+    index_ready() ; // DOM ready event
   
 } ) ; // DOM ready
