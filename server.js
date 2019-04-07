@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 
 // aquesta app de nodejs fa una foto amb una webcam conectada al USB del raspberry i la envia en una pagina html
+// doc :
+//     https://docs.opencv.org/3.0-beta/modules/imgcodecs/doc/reading_and_writing_images.html
+//     https://github.com/extrabacon/python-shell
+//     https://www.npmjs.com/package/python-shell
 //
 // Versions :
 //  1.1.a 20190216 - inici
@@ -11,10 +15,14 @@
 //  1.1.d          - posar morgan : npm install morgan --save
 //  1.1.e          - engegar timeout
 //  1.1.f          - timestamp
+//  1.1.g          - fes_photo_gimme_json
+//  1.1.h          - using same filename, avoid 304 using "random"
+//  1.1.i          - use small image
+//  1.1.j          - try to catch python error
 
-var myVersion  = "1.1.f" ;
-var png_File   = '/home/sag/express-sendfile/public/imatges/webcam/webcam.png' ; // created by python
-var Detalls = 1 ;                                                                // control de la trassa que generem via "mConsole"
+var myVersion  = "1.1.j" ;
+var png_File   = '/home/sag/express-sendfile/public/imatges/webcam/fwc.png' ;  // created by python
+var Detalls = 1 ;                                                                  // control de la trassa que generem via "mConsole"
 
 var express = require( 'express' );
 var app     = express();
@@ -34,6 +42,15 @@ app.use( express.static( path.join( __dirname, '/public' ))) ;
 
 // eina per depurar el programa
 app.use( logger( 'dev' ) ) ;                            // tiny (minimal), dev (developer), common (apache)
+
+// as there are multiple places we do a python photo, here are the global options
+var python_options = {
+  mode: 'text',
+  pythonPath: '/usr/bin/python',
+  pythonOptions: ['-u'],
+  scriptPath: '/home/sag/express-sendfile',
+  args: [ 'imatges/webcam/webcam3.png', 'value2.jpeg', 'value3' ]
+} ;
 
 // *** implement few own functions
 
@@ -84,13 +101,15 @@ function mConsole ( szIn ) {
 
 
 // set timeout
-    setInterval( myTimeout_Gen_HTML_Function, app.get( 'cfgLapse_Gen_HTML' ) ) ; // lets call own function every defined period
+//    var szOut = ">>> lets set timeout (" + app.get( 'cfgLapse_Gen_HTML' ) + ")." ;
+//    mConsole( szOut ) ;
+//    setInterval( myTimeout_Gen_HTML_Function, app.get( 'cfgLapse_Gen_HTML' ) ) ; // lets call own function every defined period
 
 
 // what to do on timeout
 function myTimeout_Gen_HTML_Function ( arg ) { // generate new page "/public/foto_seq.html"
 
-    var szOut = ">>> timeout (" + app.get( 'cfgLapse_Gen_HTML' ) + ") generar FOTO_SEQ.HTML, dirname {"+ __dirname + "}." ;
+    var szOut = ">>> event : timeout (" + app.get( 'cfgLapse_Gen_HTML' ) + ") generar FOTO_SEQ.HTML, dirname {"+ __dirname + "}." ;
     mConsole( szOut ) ;
 
     var newFN = __dirname + '/public/foto_seq.html' ;
@@ -117,43 +136,62 @@ app.get( '/', function( req, res ) {
     res.sendFile( 'index.html' ) ;
 } ) ;
 
-app.get( '/foto_seq', function ( req, res ) {
-     mConsole( '+++ foto seq - NIY' ) ;
-} ) ; // display html page with sequence of pictures
+app.get( '/fes_photo_gimme_json', function ( req, res ) {
+
+    var fixed_png_File = python_options.args[0] ; // "imatges/webcam/webcam3.png"
+
+    mConsole( '+++ /get fes foto, gimme jason' ) ;
+
+    PythonShell.run( 'fer_foto.py', python_options, function( err, results ) {
+        if ( err ) {                                                 // got error in python shell -> send a specific "error" pic
+            var szErr = '--- Python error. ' ;
+            szErr += 'Path (' + err.path + '). ' ;
+            szErr += 'Stack (' + err.stack + '). ' ;
+            console.log( szErr ) ;
+            throw err ;                                              // fatal error : stop 
+        } else {
+            console.log( '(+) Python results are (%j).', results ) ; // results is an array of messages collected during execution
+            png_File = String( results ) ;                           // convert to string
+
+            res.writeHead( 200, { 'Content-Type': 'application/json' }) ;
+            let my_json = { status: 'OK', imgURL: fixed_png_File };
+            res.end(JSON.stringify(my_json));
+        } ; // no error
+
+    } ) ; // run PythonShell
+
+} ) ; // 
 
 
 app.get( '/fem_foto', function ( req, res ) {
 
 var szResultatPhoto = "* PHOTO *" ;
 
-var python_options = {
-  mode: 'text',
-  pythonPath: '/usr/bin/python',
-  pythonOptions: ['-u'],
-  scriptPath: '/home/sag/express-sendfile',
-  args: ['value1', 'value2', 'value3']
-} ;
+// lets call /home/sag/express-sendfile/fer_foto.py
 
-// lets call /home/sag/express-sendfile/2_foto.py
+    mConsole( '+++ /get fer foto' ) ;
 
-     mConsole( '+++ fer foto' ) ;
+    PythonShell.run( 'fer_foto.py', python_options, function( err, results ) {
+        if ( err ) {                                                 // got error in python shell -> send a specific "error" pic
+            var szErr = 'python error, code (' + code + '), signal (' + signal + ').' ;
+            console.log( szErr ) ;
+            throw err ;                                              // fatal error : stop 
+        } else {
+            console.log( '(+) Python results are (%j).', results ) ; // results is an array of messages collected during execution
+            png_File = String( results ) ;                           // convert to string
 
-     PythonShell.run( '2_foto.py', python_options, function( err, results ) {
-          if ( err ) throw err ;
-          console.log( '(+) Python results are (%j).', results ) ; // results is an array consisting of messages collected during execution
-          png_File = String( results ) ;                           // convert to string
+            mConsole( '+++ enviem photo [' + png_File + '].' ) ;
 
-          mConsole( '+++ enviem photo [' + png_File + '].' ) ;
+            var imatge = fs.readFileSync( png_File ) ;
 
-          var imatge = fs.readFileSync( png_File ) ;
+            res.writeHead( 200, { 'Content-Type': 'text/html' } ) ;
+            res.write( '<p> &nbsp; * pic id * </p>' ) ;
+            res.write( '<img class="img_brd" id="imatge_webcam" width="320" height="240" src="data:image/png;base64,' ) ;
+            res.write( new Buffer(imatge).toString( 'base64' ) ) ;
+            res.end( '"/>' ) ;
+        } ; // no error
 
-          res.writeHead( 200, { 'Content-Type': 'text/html' } ) ;
-          res.write( '<p> &nbsp; * pic id * </p>' ) ;
-          res.write( '<img class="img_brd" id="imatge_webcam" width="320" height="240" src="data:image/png;base64,' ) ;
-          res.write( new Buffer(imatge).toString( 'base64' ) ) ;
-          res.end( '"/>' ) ;
-
-     } ) ; // run
+    } ) ; // run PythonShell
 
 } ) ; // do photo and send its name
 

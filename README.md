@@ -7,4 +7,6 @@
 
 *** own code saved in github.com https://github.com/sebastianet/Envia_Foto         ***
 
+*** some test from JSBIN : https://jsbin.com/kewugix/edit?html,js,console,output   ***
+
 *

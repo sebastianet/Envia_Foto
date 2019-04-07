@@ -9,6 +9,6 @@ echo "(2) +++ ports"
 sudo netstat -tulpn | grep LISTEN | grep node
 
 echo "(3) +++ la meva IP externa"
-curl -s icanhazip.com
+curl -m 2  -s icanhazip.com
 
 exit 0

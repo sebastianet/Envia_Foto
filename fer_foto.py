@@ -5,9 +5,12 @@ import cv2
 # print "### CV2 version I have is " + cv2.__version__
 
 # Fer una foto amb la webcam i posar-la en un fitxer.
-# Es crida des "1_sem.js"
+# Es crida des "/home/sag/express-sendfile/server.js"
 # Imprimim el nom del fitxer que sera el parametre de tornada
 # No imprimim res mes
+# Versions :
+#  1.a 20190320 - copiem de "/home/pi/semafor"
+#  1.b 20190403 - fem servir un sol fitxer i el seu nom es parametre de entrada
 
 # Documentacio
 #     # http://docs.opencv.org/2.4/modules/highgui/doc/reading_and_writing_images_and_video.html
@@ -19,10 +22,14 @@ import time
 timestr = time.strftime("%Y%m%d_%H%M%S")
 # print timestr
 
-szShortFN = 'webcam_' + timestr + '.png' 
-# print 'Filename (' + szShortFN + ').'
+szShortFN = 'webcam_' + timestr + '.png'  # default filename, calculated
+import sys
+numArg = len(sys.argv)
+if ( numArg > 1 ) :                       # if we have parameter
+     szShortFN = sys.argv[1]              #  then use it
+# print 'Filename (' + szShortFN + ').'     # display filename to use
 
-szFN = '/home/sag/express-sendfile/public/imatges/webcam/' + szShortFN 
+szFN = '/home/sag/express-sendfile/public/' + szShortFN 
 # print 'Large Filename (' + szFN + ').'
 
 # print '>>> do VideoCapture()'

@@ -1,4 +1,7 @@
 
+/* /home/sag/express-sendfile/public/css/photo.css */
+/* versio 1.b, 20190403                            */
+
 html, body {
       margin: 0 ;
       padding: 0 ;
@@ -37,9 +40,27 @@ H1, H2, H3, H4 {
      background-color: white ;
  }
 
+#id_posa_imatge {
+     border: 1px solid red ;
+     background-color: #A0A0A0 ;
+}
+
 .img_brd {
      border: 1px solid red ;
      padding: 5px ;
      margin-left: 10px ;
      background-color: green ;
  }
+
+.tseqima {
+     width: 100% ;
+     border: 1px solid white ;
+     background-color: #808080 ;
+ }
+
+.tseqima td {
+     width: 25% ;
+     background-color: pink ;
+     border: 1px solid green ;
+ }
+
