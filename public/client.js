@@ -62,15 +62,17 @@ var szLog ;
         szLog += 'Idx (' + idxPics + ') / (' + maxPics + '). ' ;
         console.log( szLog ) ;
 
-var szIdPutPic = '#idn_imatge_'+idxPics ;
-        console.log( ">>> sequencia imatges - ocupem la casella (%s).", szIdPutPic );
+        var szIdPutPic = '#idn_imatge_'+idxPics ;                                  // calculem el nom del lloc on posar la seguent imatge
+        console.log( ">>> sequencia imatges - ocupem la posicio (%s).", szIdPutPic );
 
         let randomStr = Math.random().toString(36).substr(2) ;                     // avoid html 304
-//        $( "#id_imatge" ).attr('src', mi_json.imgURL+ '?random=' + randomStr ) ; // request pic file and place it in page
         $( szIdPutPic ).attr( 'src', mi_json.imgURL+ '?random=' + randomStr ) ;    // request pic file and place it in page
 
         idxPics = idxPics + 1 ;
         if ( idxPics === maxPics ) { idxPics = 0 ; } ;
+        var szIdClrPic = '#idn_imatge_'+idxPics ;                                  // calculem el nom del lloc on esborrar la imatge
+        $( szIdClrPic ).attr( 'src', "imatges/webcam/webcam_320x240.png" ) ;       // request "empty" pic and place it in page
+
         timBusy = 0 ;
     }) ;
 } ; // MyTimeout( )
@@ -90,11 +92,11 @@ $( ".clkStopFotoSeq" ).click( function() {
 var myTimer = 0 ;
 let kSeconds = 20 ;
 let cntPics = 0 ;
-let maxPics = 4 ;
+let maxPics = 5;
 let idxPics = 0 ;
 let timBusy = 0 ;
 
-let myid_imatge = document.getElementById('id_imatge')
+// let myid_imatge = document.getElementById('id_imatge')
 
 // ===
 

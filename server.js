@@ -19,8 +19,9 @@
 //  1.1.h          - using same filename, avoid 304 using "random"
 //  1.1.i          - use small image
 //  1.1.j          - try to catch python error
+//  1.1.k          - display 5 images 320x240
 
-var myVersion  = "1.1.j" ;
+var myVersion  = "1.1.k" ;
 var png_File   = '/home/sag/express-sendfile/public/imatges/webcam/fwc.png' ;  // created by python
 var Detalls = 1 ;                                                                  // control de la trassa que generem via "mConsole"
 
@@ -36,7 +37,7 @@ var PythonShell  = require( 'python-shell' ) ;          // send commands to pyth
 
 require('dotenv').config();
 app.set( 'cfgPort', process.env.PORT || '8080' ) ;
-app.set( 'cfgLapse_Gen_HTML', 60000 ) ;             // mili-segons - gen HTML every ... 3 minuts = 180 segons = 180000 mSg
+app.set( 'cfgLapse_Gen_HTML', 60000 ) ;                 // mili-segons - gen HTML every ... 3 minuts = 180 segons = 180000 mSg
 
 app.use( express.static( path.join( __dirname, '/public' ))) ;
 
@@ -49,7 +50,7 @@ var python_options = {
   pythonPath: '/usr/bin/python',
   pythonOptions: ['-u'],
   scriptPath: '/home/sag/express-sendfile',
-  args: [ 'imatges/webcam/webcam3.png', 'value2.jpeg', 'value3' ]
+  args: [ 'imatges/webcam/webcam3.png', 'value2.jpeg', 'value3' ]    // only place where we specify the picture filename
 } ;
 
 // *** implement few own functions
@@ -173,14 +174,16 @@ var szResultatPhoto = "* PHOTO *" ;
 
     PythonShell.run( 'fer_foto.py', python_options, function( err, results ) {
         if ( err ) {                                                 // got error in python shell -> send a specific "error" pic
-            var szErr = 'python error, code (' + code + '), signal (' + signal + ').' ;
+            var szErr = '--- Python error. ' ;
+            szErr += 'Path (' + err.path + '). ' ;
+            szErr += 'Stack (' + err.stack + '). ' ;
             console.log( szErr ) ;
             throw err ;                                              // fatal error : stop 
         } else {
             console.log( '(+) Python results are (%j).', results ) ; // results is an array of messages collected during execution
             png_File = String( results ) ;                           // convert to string
 
-            mConsole( '+++ enviem photo [' + png_File + '].' ) ;
+            mConsole( '+++ enviem photo via base64 [' + png_File + '].' ) ;
 
             var imatge = fs.readFileSync( png_File ) ;
 
