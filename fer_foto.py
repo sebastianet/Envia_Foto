@@ -45,8 +45,8 @@ if not cap.isOpened() :
 
 # try using own values
 # print '>>> set W 320, H 240.'
-cap.set( cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 320 )     # 1280 1024 800 640 320
-cap.set( cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 240 )    # 1024  800 600 480 240
+cap.set( cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 160 )     # 1280 1024 800 640 320 ?160
+cap.set( cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 120 )    # 1024  800 600 480 240 ?120
 # cv2.waitKey( 3000 )
 
 if ( cap.isOpened() ):

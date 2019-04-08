@@ -83,7 +83,7 @@ var szLog ;
         if ( idxPics === maxPics ) { idxPics = 0 ; } ;
 
         var szIdClrPic = '#idn_imatge_'+idxPics ;                                  // calculem el nom del lloc on esborrar la imatge
-        $( szIdClrPic ).attr( 'src', "imatges/webcam/webcam_320x240.png" ) ;       // request "empty" pic and place it in page
+        $( szIdClrPic ).attr( 'src', img_buida ) ;                                 // request "empty" pic and place it in page
 
         var szIdClrDate = '#idn_tmstmp_'+idxPics ;                                  // calculem el nom del lloc on posar el seguent texte
         $( szIdClrDate ).html( '- - -' ) ;                                          // write timestamp in cell
@@ -110,9 +110,12 @@ var myTimer = 0 ;
 let kSeconds = 30 ;
 let cntPics = 0 ;
 
-let maxPics = 5 ;    // compte que index.htm ha de tenir els IDs corresponents !
+let maxPics = 10 ;   // compte que index.htm ha de tenir els IDs corresponents ! img(320x240) en caben 5 ; img(160x120)  - 10 
 let idxPics = 0 ;
 let timBusy = 0 ;    // intentem controlar el retard del servidor ...
+
+// let img_buida = "imatges/webcam/webcam_320x240.png" ;
+let img_buida = "imatges/webcam/webcam_160x120.png" ;
 
 // let myid_imatge = document.getElementById('id_imatge')
 

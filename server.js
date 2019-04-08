@@ -9,6 +9,7 @@
 // git commands :
 //     git commit -am "version description"
 //     git push
+//     https://github.com/sebastianet/Envia_Foto
 //
 // Versions :
 //  1.1.a 20190216 - inici
@@ -26,8 +27,9 @@
 //  1.1.k          - display 5 images 320x240
 //  1.1.l          - timestamp images on 2nd row
 //  1.1.m          - timestamp images on 2nd row properly
+//  1.1.n          - display 10 images 160x120
 
-var myVersion  = "1.1.m" ;
+var myVersion  = "1.1.n" ;
 var png_File   = '/home/sag/express-sendfile/public/imatges/webcam/fwc.png' ;  // created by python
 var Detalls = 1 ;                                                                  // control de la trassa que generem via "mConsole"
 
