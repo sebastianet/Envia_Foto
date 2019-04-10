@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
-// aquesta app de nodejs fa una foto amb una webcam conectada al USB del raspberry i la envia en una pagina html
+// aquesta app de nodejs fa :
+//     una foto 320x240 amb una webcam conectada al USB del raspberry i la envia en una pagina html
+//     una sequencia de fotos 160x120
 // doc :
 //     https://docs.opencv.org/3.0-beta/modules/imgcodecs/doc/reading_and_writing_images.html
 //     https://github.com/extrabacon/python-shell
@@ -10,6 +12,11 @@
 //     git commit -am "version description"
 //     git push
 //     https://github.com/sebastianet/Envia_Foto
+//
+// pending :
+//     trace all express branches
+//     verify "OK" in JSON
+//
 //
 // Versions :
 //  1.1.a 20190216 - inici
@@ -27,15 +34,17 @@
 //  1.1.k          - display 5 images 320x240
 //  1.1.l          - timestamp images on 2nd row
 //  1.1.m          - timestamp images on 2nd row properly
-//  1.1.n          - display 10 images 160x120
+//  1.1.n 20190408 - display 10 images 160x120
+//  1.1.o 20190410 - trace all static files we serve
+//  1.1.p 20190410 - log an initial line showing version
+//  1.1.q 20190410 - send ID on DOM ready()
 
-var myVersion  = "1.1.n" ;
-var png_File   = '/home/sag/express-sendfile/public/imatges/webcam/fwc.png' ;  // created by python
-var Detalls = 1 ;                                                                  // control de la trassa que generem via "mConsole"
+var myVersio  = "1.1.q" ;
+var png_File  = '/home/sag/express-sendfile/public/imatges/webcam/fwc.png' ;  // created by python
+var Detalls   = 1 ;                                                           // control de la trassa que generem via "mConsole"
 
 var express = require( 'express' );
 var app     = express();
-
 var path    = require( 'path' );
 var logger  = require( 'morgan' );                      // log requests to the console (express4)
 var fs      = require( 'fs' ) ;                         // get JPG or PNG
@@ -44,10 +53,10 @@ var gpio         = require( 'rpi-gpio' ) ;              // GPIO pin access
 var PythonShell  = require( 'python-shell' ) ;          // send commands to python
 
 require('dotenv').config();
+
 app.set( 'cfgPort', process.env.PORT || '8080' ) ;
 app.set( 'cfgLapse_Gen_HTML', 60000 ) ;                 // mili-segons - gen HTML every ... 3 minuts = 180 segons = 180000 mSg
-
-app.use( express.static( path.join( __dirname, '/public' ))) ;
+app.set( 'appHostname', require('os').hostname() ) ;
 
 // eina per depurar el programa
 app.use( logger( 'dev' ) ) ;                            // tiny (minimal), dev (developer), common (apache)
@@ -60,6 +69,9 @@ var python_options = {
   scriptPath: '/home/sag/express-sendfile',
   args: [ 'imatges/webcam/webcam3.png', 'value2.jpeg', 'value3' ]    // only place where we specify the picture filename
 } ;
+
+// string to identify this program. Sent to own log at start and to client on request
+szID = 'app SEND PHOTO. Versio (' + myVersio + '), listening on port {'+ app.get( 'cfgPort' ) + '}.' ;
 
 // *** implement few own functions
 
@@ -140,16 +152,36 @@ function myTimeout_Gen_HTML_Function ( arg ) { // generate new page "/public/fot
 
 // +++ set express branches
 
+// trace all the requirements we serve :
+app.use( function ( req, res, next ) {
+    const my_url = req.url ;
+    const my_path = req.path ;
+    var szOut = '### Request - URL (' + my_url + '), PATH (' + my_path + ').' ;
+    mConsole( szOut ) ;
+    next() ;
+} ) ; // timestamp all
+
+// branch to serve static files must be later that branch tracing all traffic 
+app.use( express.static( path.join( __dirname, '/public' ))) ; // serve static files
+
 app.get( '/', function( req, res ) {
     mConsole( '+++ send INDEX.HTML' ) ;
     res.sendFile( 'index.html' ) ;
 } ) ;
 
+app.get( '/gimme_ID', function ( req, res ) {  // client request for identification
+    mConsole( '+++ send ID' ) ;
+    res.writeHead( 200, { 'Content-Type': 'text/html' } ) ; // write HTTP headers 
+    res.write( szID ) ;
+    res.end( ) ;
+
+} ) ; // get(/gimme_ID)
+
 app.get( '/fes_photo_gimme_json', function ( req, res ) {
 
     var fixed_png_File = python_options.args[0] ; // "imatges/webcam/webcam3.png"
 
-    mConsole( '+++ /get fes foto, gimme jason' ) ;
+    mConsole( '+++ /get fes foto, gimme json' ) ;
 
     PythonShell.run( 'fer_foto.py', python_options, function( err, results ) {
         if ( err ) {                                                 // got error in python shell -> send a specific "error" pic
@@ -164,12 +196,12 @@ app.get( '/fes_photo_gimme_json', function ( req, res ) {
 
             res.writeHead( 200, { 'Content-Type': 'application/json' }) ;
             let my_json = { status: 'OK', imgURL: fixed_png_File };
-            res.end(JSON.stringify(my_json));
+            res.end( JSON.stringify( my_json ) ) ;
         } ; // no error
 
     } ) ; // run PythonShell
 
-} ) ; // 
+} ) ; // get(/fes_photo_gimme_json) do photo and send its name
 
 
 app.get( '/fem_foto', function ( req, res ) {
@@ -204,11 +236,10 @@ var szResultatPhoto = "* PHOTO *" ;
 
     } ) ; // run PythonShell
 
-} ) ; // do photo and send its name
-
+} ) ; // do photo and send it using HTML
 
 // +++ start server
 
 app.listen( app.get( 'cfgPort' ), () => {
-    mConsole( '... app SENDPHOTO listening on port {'+ app.get( 'cfgPort' ) + '} ...' )
+    mConsole( szID ) ;
 } ) ;

@@ -75,15 +75,15 @@ var szLog ;
         var szIdPicDate = '#idn_tmstmp_'+idxPics ;                                  // calculem el nom del lloc on posar el seguent texte
         var szThisMoment = genTimeStamp() ;
         console.log( ">>> sequencia imatges - marquem posicio (%s) amb (%s).", szIdPicDate, szThisMoment ) ;
-        $( szIdPicDate ).html( szThisMoment ) ;                                       // write timestamp in cell
+        $( szIdPicDate ).html( szThisMoment ) ;                                     // write timestamp in cell
 
 // let work with "next" item
 
         idxPics = idxPics + 1 ;
         if ( idxPics === maxPics ) { idxPics = 0 ; } ;
 
-        var szIdClrPic = '#idn_imatge_'+idxPics ;                                  // calculem el nom del lloc on esborrar la imatge
-        $( szIdClrPic ).attr( 'src', img_buida ) ;                                 // request "empty" pic and place it in page
+        var szIdClrPic = '#idn_imatge_'+idxPics ;                                   // calculem el nom del lloc on esborrar la imatge
+        $( szIdClrPic ).attr( 'src', img_buida ) ;                                  // request "empty" pic and place it in page
 
         var szIdClrDate = '#idn_tmstmp_'+idxPics ;                                  // calculem el nom del lloc on posar el seguent texte
         $( szIdClrDate ).html( '- - -' ) ;                                          // write timestamp in cell
@@ -128,6 +128,11 @@ function index_ready() {              // DOM ready for index.htm
 // posar la data actual a dalt al mig - aixi diferenciem re-loads
     var szAra = '<center>./public/index.html - now is [' + genTimeStamp() + ']</center>' ;
     $( "#id_date" ).html( szAra ) ; // show actual date
+
+    $.get( '/gimme_ID', function( page ) {
+        console.log( '*** [' + genTimeStamp() + '] get(/gimme_ID)' ) ;
+        $( "#id_estat" ).html( page ) ; // show received HTML at specific <div>
+    }) ; // get()
 
 } ; // index_ready(), DOM ready for INDEX.HTM
 
