@@ -31,17 +31,17 @@ function genTimeStamp ( arg ) {
 // === que fem quan es pica el link de "fer foto" :
 $( ".clkFerFoto" ).click( function() {
     $.get( '/fem_foto', function( page ) {
-        console.log( '*** [' + genTimeStamp() + '] index - demanem al server la sub-pagina FER_FOTO' ) ;
+        console.log( '*** [' + genTimeStamp() + '] index - rebem del server la sub-pagina FER_FOTO' ) ;
         $( "#id_photo" ).html( page ) ; // show received HTML at specific <div>
-    }) ; // get()
+    } ) ; // get(/fem_foto)
 }) ; // clkFerFoto
 
 // === que fem quan es pica el link de "foto seq" : *** obsolete ***
 $( ".clkFotoSeq" ).click( function() {
     $.get( '/foto_seq.html', function( page ) {
-        console.log( '*** [' + genTimeStamp() + '] index - demanem al server la sub-pagina FOTO_SEQ' ) ;
+        console.log( '*** [' + genTimeStamp() + '] index - rebem del server la sub-pagina FOTO_SEQ' ) ;
         $( "#id_photo" ).html( page ) ; // show received HTML at specific <div>
-    }) ; // get()
+    } ) ; // get(foto_seq)
 }) ; // clkFotoSeq
 
 
@@ -77,7 +77,7 @@ var szLog ;
         console.log( ">>> sequencia imatges - marquem posicio (%s) amb (%s).", szIdPicDate, szThisMoment ) ;
         $( szIdPicDate ).html( szThisMoment ) ;                                     // write timestamp in cell
 
-// let work with "next" item
+// lets work with "next" item
 
         idxPics = idxPics + 1 ;
         if ( idxPics === maxPics ) { idxPics = 0 ; } ;
@@ -96,15 +96,23 @@ var szLog ;
 
 
 $( ".clkStartFotoSeq" ).click( function() {
-    myTimer = setInterval(_ => { MyTimeout() ; }, 1000 * kSeconds) ;
-//    myTimer = setInterval( MyTimeout, 1000 * kSeconds) ;
+//     myTimer = setInterval(_ => { MyTimeout() ; }, 1000 * kSeconds) ;
+    myTimer = setInterval( MyTimeout, 1000 * kSeconds) ;
     console.log( '*** [' + genTimeStamp() + '] click Start Timer' + ', id ' + myTimer ) ;
-}) ; // clkStartFotoSeq
+    $.post( '/send_status_to_client/opid=start_timeout', function( page ) {
+        console.log( '*** [' + genTimeStamp() + '] index - rebem del server status Start Timeout' ) ;
+        $( "#id_estat" ).html( page ) ; // show received HTML at specific <div>
+    } ) ; // get(/send_status_to_client/opid=start_timeout)
+} ) ; // clkStartFotoSeq
 
 $( ".clkStopFotoSeq" ).click( function() {
     console.log( '*** [' + genTimeStamp() + '] click Stop Timer' + ', id ' + myTimer ) ;
     clearInterval(myTimer) ;
-}) ; // clkStopFotoSeq
+    $.post( '/send_status_to_client/opid=stop_sequence', function( page ) {
+        console.log( '*** [' + genTimeStamp() + '] index - rebem del server status Stop Photo Sequence' ) ;
+        $( "#id_estat" ).html( page ) ; // show received HTML at specific <div>
+    } ) ; // get(/send_status_to_client/opid=stop_sequence)
+} ) ; // clkStopFotoSeq
 
 var myTimer = 0 ;
 let kSeconds = 30 ;

@@ -36,10 +36,13 @@
 //  1.1.m          - timestamp images on 2nd row properly
 //  1.1.n 20190408 - display 10 images 160x120
 //  1.1.o 20190410 - trace all static files we serve
-//  1.1.p 20190410 - log an initial line showing version
-//  1.1.q 20190410 - send ID on DOM ready()
+//  1.1.p          - log an initial line showing version
+//  1.1.q          - send ID on DOM ready()
+//  1.1.r 20190413 - timestamp PythonResults
+//  1.1.s          - client posts "timer stop" and "timer start" events
+//  1.1.t          - trace Python results properly
 
-var myVersio  = "1.1.q" ;
+var myVersio  = "1.1.t" ;
 var png_File  = '/home/sag/express-sendfile/public/imatges/webcam/fwc.png' ;  // created by python
 var Detalls   = 1 ;                                                           // control de la trassa que generem via "mConsole"
 
@@ -164,19 +167,32 @@ app.use( function ( req, res, next ) {
 // branch to serve static files must be later that branch tracing all traffic 
 app.use( express.static( path.join( __dirname, '/public' ))) ; // serve static files
 
+//
 app.get( '/', function( req, res ) {
     mConsole( '+++ send INDEX.HTML' ) ;
     res.sendFile( 'index.html' ) ;
-} ) ;
+} ) ; // app.get( '/'
 
+
+// client uses : $.post( '/send_status_to_client/opid=stop_sequence'
+app.post ( '/send_status_to_client/opid=:cli_opcode', function ( req, res ) {  // client post "stop timer"
+var Operacio = req.params.cli_opcode ;
+let sz_OPCODE = genTimeStamp() + " *** operacio al client : (" + Operacio + ") ***" ;
+    mConsole( '+++ POST (' + Operacio + ').' ) ;
+    res.writeHead( 200, { 'Content-Type': 'text/html' } ) ; // write HTTP headers 
+    res.write( sz_OPCODE ) ;
+    res.end( ) ;
+} ) ; // post
+
+// app.get( '/gimme_ID'
 app.get( '/gimme_ID', function ( req, res ) {  // client request for identification
     mConsole( '+++ send ID' ) ;
     res.writeHead( 200, { 'Content-Type': 'text/html' } ) ; // write HTTP headers 
     res.write( szID ) ;
     res.end( ) ;
+} ) ; // app.get( '/gimme_ID'
 
-} ) ; // get(/gimme_ID)
-
+//
 app.get( '/fes_photo_gimme_json', function ( req, res ) {
 
     var fixed_png_File = python_options.args[0] ; // "imatges/webcam/webcam3.png"
@@ -191,7 +207,8 @@ app.get( '/fes_photo_gimme_json', function ( req, res ) {
             console.log( szErr ) ;
             throw err ;                                              // fatal error : stop 
         } else {
-            console.log( '(+) Python results are (%j).', results ) ; // results is an array of messages collected during execution
+var sz_PY_result = '(+) Python results #1 are (%j).', results ;
+            mConsole( sz_PY_result ) ;                               // results is an array of messages collected during execution
             png_File = String( results ) ;                           // convert to string
 
             res.writeHead( 200, { 'Content-Type': 'application/json' }) ;
@@ -203,7 +220,7 @@ app.get( '/fes_photo_gimme_json', function ( req, res ) {
 
 } ) ; // get(/fes_photo_gimme_json) do photo and send its name
 
-
+//
 app.get( '/fem_foto', function ( req, res ) {
 
 var szResultatPhoto = "* PHOTO *" ;
@@ -220,7 +237,7 @@ var szResultatPhoto = "* PHOTO *" ;
             console.log( szErr ) ;
             throw err ;                                              // fatal error : stop 
         } else {
-            console.log( '(+) Python results are (%j).', results ) ; // results is an array of messages collected during execution
+            mConsole( `(+) Python results are (%j).`, results ) ;    // results is an array of messages collected during execution
             png_File = String( results ) ;                           // convert to string
 
             mConsole( '+++ enviem photo via base64 [' + png_File + '].' ) ;
