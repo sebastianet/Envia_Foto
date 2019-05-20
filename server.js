@@ -15,34 +15,34 @@
 //
 // pending :
 //     trace all express branches
-//     verify "OK" in JSON
-//
 //
 // Versions :
-//  1.1.a 20190216 - inici
-//  1.1.b          - posar rpi-gpio : npm install rpi-gpio --save
-//  1.1.c          - posar python-shell : npm install python-shell --save     https://github.com/extrabacon/python-shell
-//                     error : https://github.com/extrabacon/python-shell/issues/177
-//                     ens cal python-shell v0.4.0 maxim (unless we go node v11) - see package.json
-//  1.1.d          - posar morgan : npm install morgan --save
-//  1.1.e          - engegar timeout
-//  1.1.f          - timestamp
-//  1.1.g          - fes_photo_gimme_json
-//  1.1.h          - using same filename, avoid 304 using "random"
-//  1.1.i          - use small image
-//  1.1.j          - try to catch python error
-//  1.1.k          - display 5 images 320x240
-//  1.1.l          - timestamp images on 2nd row
-//  1.1.m          - timestamp images on 2nd row properly
-//  1.1.n 20190408 - display 10 images 160x120
-//  1.1.o 20190410 - trace all static files we serve
-//  1.1.p          - log an initial line showing version
-//  1.1.q          - send ID on DOM ready()
-//  1.1.r 20190413 - timestamp PythonResults
-//  1.1.s          - client posts "timer stop" and "timer start" events
-//  1.1.t          - trace Python results properly
+//   1.1.a 20190216 - inici
+//   1.1.b          - posar rpi-gpio : npm install rpi-gpio --save
+//   1.1.c          - posar python-shell : npm install python-shell --save     https://github.com/extrabacon/python-shell
+//                      error : https://github.com/extrabacon/python-shell/issues/177
+//                      ens cal python-shell v0.4.0 maxim (unless we go node v11) - see package.json
+//   1.1.d          - posar morgan : npm install morgan --save
+//   1.1.e          - engegar timeout
+//   1.1.f          - timestamp
+//   1.1.g          - fes_photo_gimme_json
+//   1.1.h          - using same filename, avoid 304 using "random"
+//   1.1.i          - use small image
+//   1.1.j          - try to catch python error
+//   1.1.k          - display 5 images 320x240
+//   1.1.l          - timestamp images on 2nd row
+//   1.1.m          - timestamp images on 2nd row properly
+//   1.1.n 20190408 - display 10 images 160x120
+//   1.1.o 20190410 - trace all static files we serve
+//   1.1.p          - log an initial line showing version
+//   1.1.q          - send ID on DOM ready()
+//   1.1.r 20190413 - timestamp PythonResults
+//   1.1.s          - client posts "timer stop" and "timer start" events
+//   1.1.t          - trace Python results properly
+//   1.1.u 20190520 - verify "OK" in JSON
+//
 
-var myVersio  = "1.1.t" ;
+var myVersio  = "1.1.u" ;
 var png_File  = '/home/sag/express-sendfile/public/imatges/webcam/fwc.png' ;  // created by python
 var Detalls   = 1 ;                                                           // control de la trassa que generem via "mConsole"
 

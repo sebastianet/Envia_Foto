@@ -58,37 +58,43 @@ var szLog ;
 
         // pendent : mirar mi_json.status
 
-        cntPics = cntPics + 1 ;
-        szLog = '+++ [' + genTimeStamp() + '] rebem JSON : q(' + mi_json.status + '), url (' + mi_json.imgURL + '). ' ;
-        szLog += 'Cnt (' + cntPics + '). ' ;
-        szLog += 'Idx (' + idxPics + ') / (' + maxPics + '). ' ;
-        console.log( szLog ) ;
+        if ( mi_json.status == "OK" ) {
 
-        var szIdPutPic = '#idn_imatge_'+idxPics ;                                  // calculem el nom del lloc on posar la seguent imatge
-        console.log( ">>> sequencia imatges - ocupem posicio (%s).", szIdPutPic ) ;
+            cntPics = cntPics + 1 ;
+            szLog = '+++ [' + genTimeStamp() + '] rebem JSON : q(' + mi_json.status + '), url (' + mi_json.imgURL + '). ' ;
+            szLog += 'Cnt (' + cntPics + '). ' ;
+            szLog += 'Idx (' + idxPics + ') / (' + maxPics + '). ' ;
+            console.log( szLog ) ;
 
-        let randomStr = Math.random().toString(36).substr(2) ;                     // avoid html 304
-        $( szIdPutPic ).attr( 'src', mi_json.imgURL+ '?random=' + randomStr ) ;    // request pic file and place it in page
+            var szIdPutPic = '#idn_imatge_'+idxPics ;                                  // calculem el nom del lloc on posar la seguent imatge
+            console.log( ">>> sequencia imatges - ocupem posicio (%s).", szIdPutPic ) ;
+
+            let randomStr = Math.random().toString(36).substr(2) ;                     // avoid html 304
+            $( szIdPutPic ).attr( 'src', mi_json.imgURL+ '?random=' + randomStr ) ;    // request pic file and place it in page
 
 // lets timestamp the picture :
 
-        var szIdPicDate = '#idn_tmstmp_'+idxPics ;                                  // calculem el nom del lloc on posar el seguent texte
-        var szThisMoment = genTimeStamp() ;
-        console.log( ">>> sequencia imatges - marquem posicio (%s) amb (%s).", szIdPicDate, szThisMoment ) ;
-        $( szIdPicDate ).html( szThisMoment ) ;                                     // write timestamp in cell
+            var szIdPicDate = '#idn_tmstmp_'+idxPics ;                                  // calculem el nom del lloc on posar el seguent texte
+            var szThisMoment = genTimeStamp() ;
+            console.log( ">>> sequencia imatges - marquem posicio (%s) amb (%s).", szIdPicDate, szThisMoment ) ;
+            $( szIdPicDate ).html( szThisMoment ) ;                                     // write timestamp in cell
 
 // lets work with "next" item
 
-        idxPics = idxPics + 1 ;
-        if ( idxPics === maxPics ) { idxPics = 0 ; } ;
+            idxPics = idxPics + 1 ;
+            if ( idxPics === maxPics ) { idxPics = 0 ; } ;
 
-        var szIdClrPic = '#idn_imatge_'+idxPics ;                                   // calculem el nom del lloc on esborrar la imatge
-        $( szIdClrPic ).attr( 'src', img_buida ) ;                                  // request "empty" pic and place it in page
+            var szIdClrPic = '#idn_imatge_'+idxPics ;                                   // calculem el nom del lloc on esborrar la imatge
+            $( szIdClrPic ).attr( 'src', img_buida ) ;                                  // request "empty" pic and place it in page
 
-        var szIdClrDate = '#idn_tmstmp_'+idxPics ;                                  // calculem el nom del lloc on posar el seguent texte
-        $( szIdClrDate ).html( '- - -' ) ;                                          // write timestamp in cell
+            var szIdClrDate = '#idn_tmstmp_'+idxPics ;                                  // calculem el nom del lloc on posar el seguent texte
+            $( szIdClrDate ).html( '- - -' ) ;                                          // write timestamp in cell
 
-        timBusy = 0 ;
+            timBusy = 0 ;
+        } else {
+            var szError = genTimeStamp() + 'Error RxJSON ' + mi_json.status ;
+            $( "#id_estat" ).szError ; // show error message at specific <div>
+        } ; 
 
     }) ; // getJSON()
 
