@@ -1,0 +1,6 @@
+// git commands :
+//     git commit -am "version description"
+//     git config credential.helper store
+//     git push -u origin master
+//     git repository : https://github.com/sebastianet/Envia_Foto
+
