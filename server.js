@@ -2,7 +2,7 @@
 
 // aquesta app de nodejs fa :
 //     una foto 320x240 amb una webcam conectada al USB del raspberry i la envia en una pagina html
-//     una sequencia de fotos 160x120
+//     una sequencia de fotos 160x120 - s'envia el nom del fitxer en un objecte JSON i el client el demana i posiciona
 // doc :
 //     https://docs.opencv.org/3.0-beta/modules/imgcodecs/doc/reading_and_writing_images.html
 //     https://github.com/extrabacon/python-shell
@@ -10,8 +10,8 @@
 //
 // git commands :
 //     git commit -am "version description"
-//     git push
-//     https://github.com/sebastianet/Envia_Foto
+//     git push -u origin master
+//     git repository : https://github.com/sebastianet/Envia_Foto
 //
 // pending :
 //     trace all express branches
@@ -40,9 +40,10 @@
 //   1.1.s          - client posts "timer stop" and "timer start" events
 //   1.1.t          - trace Python results properly
 //   1.1.u 20190520 - verify "OK" in JSON
+//   1.1.v 20190614 - client asks for filename in json and requests it and puts it in html
 //
 
-var myVersio  = "1.1.u" ;
+var myVersio  = "1.1.v" ;
 var png_File  = '/home/sag/express-sendfile/public/imatges/webcam/fwc.png' ;  // created by python
 var Detalls   = 1 ;                                                           // control de la trassa que generem via "mConsole"
 
