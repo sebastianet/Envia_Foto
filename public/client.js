@@ -1,4 +1,21 @@
 
+// +++ variables
+
+var myTimer = 0 ;
+let kSeconds = 45 ;
+let cntPics = 0 ;
+
+let maxPics = 10 ;   // compte que index.htm ha de tenir els IDs corresponents ! img(320x240) en caben 5 ; img(160x120)  - 10 
+let idxPics = 0 ;
+let timBusy = 0 ;    // intentem controlar el retard del servidor ...
+
+// let img_buida = "imatges/webcam/webcam_320x240.png" ;
+let img_buida = "imatges/webcam/webcam_160x120.png" ;
+
+// let myid_imatge = document.getElementById('id_imatge')
+
+// +++ funcions
+
 // nova funcio yymmdd de Date() - at client
 Date.prototype.yyyymmdd = function () {                            
 	var yyyy = this.getFullYear().toString() ;                                    
@@ -56,8 +73,6 @@ var szLog ;
 
     $.getJSON( '/fes_photo_gimme_json', function( mi_json ) {
 
-        // pendent : mirar mi_json.status
-
         if ( mi_json.status == "OK" ) {
 
             cntPics = cntPics + 1 ;
@@ -104,8 +119,9 @@ var szLog ;
 $( ".clkStartFotoSeq" ).click( function() {
 //     myTimer = setInterval(_ => { MyTimeout() ; }, 1000 * kSeconds) ;
     myTimer = setInterval( MyTimeout, 1000 * kSeconds) ;
-    console.log( '*** [' + genTimeStamp() + '] click Start Timer' + ', id ' + myTimer ) ;
-    $.post( '/send_status_to_client/opid=start_timeout', function( page ) {
+    console.log( '*** [' + genTimeStamp() + '] click Start Timer' + ', id ' + myTimer + ', timeout (' + kSeconds + ') segons.' ) ;
+    var szOp='/send_status_to_client/opid=start_timeout&opto='+kSeconds ;
+    $.post( szOp, function( page ) {
         console.log( '*** [' + genTimeStamp() + '] index - rebem del server status Start Timeout' ) ;
         $( "#id_estat" ).html( page ) ; // show received HTML at specific <div>
     } ) ; // get(/send_status_to_client/opid=start_timeout)
@@ -114,24 +130,12 @@ $( ".clkStartFotoSeq" ).click( function() {
 $( ".clkStopFotoSeq" ).click( function() {
     console.log( '*** [' + genTimeStamp() + '] click Stop Timer' + ', id ' + myTimer ) ;
     clearInterval(myTimer) ;
-    $.post( '/send_status_to_client/opid=stop_sequence', function( page ) {
+    var szOp='/send_status_to_client/opid=stop_sequence&opto=0' ;
+    $.post( szOp, function( page ) {
         console.log( '*** [' + genTimeStamp() + '] index - rebem del server status Stop Photo Sequence' ) ;
         $( "#id_estat" ).html( page ) ; // show received HTML at specific <div>
     } ) ; // get(/send_status_to_client/opid=stop_sequence)
 } ) ; // clkStopFotoSeq
-
-var myTimer = 0 ;
-let kSeconds = 30 ;
-let cntPics = 0 ;
-
-let maxPics = 10 ;   // compte que index.htm ha de tenir els IDs corresponents ! img(320x240) en caben 5 ; img(160x120)  - 10 
-let idxPics = 0 ;
-let timBusy = 0 ;    // intentem controlar el retard del servidor ...
-
-// let img_buida = "imatges/webcam/webcam_320x240.png" ;
-let img_buida = "imatges/webcam/webcam_160x120.png" ;
-
-// let myid_imatge = document.getElementById('id_imatge')
 
 // ===
 
