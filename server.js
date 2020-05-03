@@ -3,6 +3,9 @@
 // aquesta app de nodejs fa :
 //     una foto 320x240 amb una webcam conectada al USB del raspberry i la envia en una pagina html
 //     una sequencia de fotos 160x120 - s'envia el nom del fitxer en un objecte JSON i el client el demana i posiciona
+//     si hi ha un error en fer la foto des python, el client demana "bio_hazard.png" - see /public/client.js
+//     despres de posar la foto a la pagina, es posa "webcam_160x120.png" a la casella seguent, esborrant la foto de la volta anterior
+//
 // doc :
 //     https://docs.opencv.org/3.0-beta/modules/imgcodecs/doc/reading_and_writing_images.html
 //     https://github.com/extrabacon/python-shell
@@ -44,11 +47,19 @@
 //   1.1.u 20190520 - verify "OK" in JSON
 //   1.1.v 20190614 - client asks for filename in json ; on respinse, it requests it and puts it in html
 //   1.1.w 20190614 - trace timeout at client, so python does not crash
+//   1.1.x 20190617 - catch ENOENT and EADDRINUSE 
+//   1.1.y 20200503 - improve some traces
 //
 
-var myVersio  = "1.1.w" ;
+// les meves variables i constants
+// ================================
+
+var myVersio  = "1.1.y" ;
 var png_File  = '/home/sag/express-sendfile/public/imatges/webcam/fwc.png' ;  // created by python
 var Detalls   = 1 ;                                                           // control de la trassa que generem via "mConsole"
+
+// moduls que ens calen
+// =====================
 
 var express = require( 'express' );
 var app     = express();
@@ -57,9 +68,14 @@ var logger  = require( 'morgan' );                      // log requests to the c
 var fs      = require( 'fs' ) ;                         // get JPG or PNG
 
 var gpio         = require( 'rpi-gpio' ) ;              // GPIO pin access
-var PythonShell  = require( 'python-shell' ) ;          // send commands to python
+// var PythonShell  = require( 'python-shell' ) ;          // send commands to python
+let {PythonShell}  = require( 'python-shell' ) ;  
+var sprintf      = require('sprintf-js').sprintf ;      // npm install sprintf-js
 
-require('dotenv').config();
+// configuracio
+// =============
+
+require( 'dotenv' ).config() ;                          // npm install dotenv
 
 app.set( 'cfgPort', process.env.PORT || '8080' ) ;
 app.set( 'cfgLapse_Gen_HTML', 60000 ) ;                 // mili-segons - gen HTML every ... 3 minuts = 180 segons = 180000 mSg
@@ -81,6 +97,7 @@ var python_options = {
 szID = 'app SEND PHOTO. Versio (' + myVersio + '), listening on port {'+ app.get( 'cfgPort' ) + '}.' ;
 
 // *** implement few own functions
+// ================================
 
 // Date() prototypes - use as 
 //    var szOut = (new Date).yyyymmdd() + '-' + (new Date).hhmmss() + ' ' + szIn + '<br>' ;
@@ -191,7 +208,7 @@ let sz_Opcode = genTimeStamp() + " *** operacio al client : (" + Operacio + "), 
 
 // app.get( '/gimme_ID'
 app.get( '/gimme_ID', function ( req, res ) {  // client request for identification
-    mConsole( '+++ send ID' ) ;
+    mConsole( '+++ send ID (' + szID + ').' ) ;
     res.writeHead( 200, { 'Content-Type': 'text/html' } ) ; // write HTTP headers 
     res.write( szID ) ;
     res.end( ) ;
@@ -204,21 +221,38 @@ app.get( '/fes_photo_gimme_json', function ( req, res ) {
 
     mConsole( '+++ /get fes foto, gimme json' ) ;
 
-    PythonShell.run( 'fer_foto.py', python_options, function( err, results ) {
+    PythonShell.run( 'fer_foto.py', python_options, function( err, results ) { // results is an array of messages collected during execution
+
         if ( err ) {                                                 // got error in python shell -> send a specific "error" pic
+
             var szErr = '--- Python error. ' ;
             szErr += 'Path (' + err.path + '). ' ;
             szErr += 'Stack (' + err.stack + '). ' ;
             console.log( szErr ) ;
             throw err ;                                              // fatal error : stop 
-        } else {
-            var sz_PY_result = `(+) Python results #1 are (%j).`, results ;
-            mConsole( sz_PY_result ) ;                               // results is an array of messages collected during execution
-            png_File = String( results ) ;                           // convert to string
 
-            res.writeHead( 200, { 'Content-Type': 'application/json' }) ;
-            let my_json = { status: 'OK', imgURL: fixed_png_File };
-            res.end( JSON.stringify( my_json ) ) ;
+        } else {
+
+//            var sz_PY_result = sprintf( '(+) Python results #1 are (%j).', results ) ;
+//            mConsole( sz_PY_result ) ;                          
+//            console.log( '(+) Python results #1 are (%j).', results ) ;
+
+            png_File = String( results[0] ) ;                        // convert to string
+            mConsole( "(+1) python filename (" + png_File + ")." ) ;                          
+
+            if ( png_File.length > 1 ) {
+
+                res.writeHead( 200, { 'Content-Type': 'application/json' }) ;
+                let my_json = { status: 'OK', imgURL: fixed_png_File } ;
+                res.end( JSON.stringify( my_json ) ) ;
+
+            } else { // no pic == filename = "."
+
+                let my_json = { status: 'KO', imgURL: fixed_png_File } ;
+                res.end( JSON.stringify( my_json ) ) ;
+
+            } ;
+
         } ; // no error
 
     } ) ; // run PythonShell
@@ -235,25 +269,52 @@ var szResultatPhoto = "* PHOTO *" ;
     mConsole( '+++ /get fer foto' ) ;
 
     PythonShell.run( 'fer_foto.py', python_options, function( err, results ) {
+
         if ( err ) {                                                 // got error in python shell -> send a specific "error" pic
+
             var szErr = '--- Python error. ' ;
             szErr += 'Path (' + err.path + '). ' ;
             szErr += 'Stack (' + err.stack + '). ' ;
             console.log( szErr ) ;
             throw err ;                                              // fatal error : stop 
+
         } else {
-            mConsole( `(+) Python results are (%j).`, results ) ;    // results is an array of messages collected during execution
-            png_File = String( results ) ;                           // convert to string
 
-            mConsole( '+++ enviem photo via base64 [' + png_File + '].' ) ;
+//            var szPyth = `(+) Python results are (%j).`, results ;
+//            mConsole( szPyth ) ;                                     // results is an array of messages collected during execution
 
-            var imatge = fs.readFileSync( png_File ) ;
+            png_File = String( results[0] ) ;                        // convert to string
+            mConsole( "(+2) get single photo into file (" + png_File + ")." ) ;                          
 
-            res.writeHead( 200, { 'Content-Type': 'text/html' } ) ;
-            res.write( '<p> &nbsp; * pic id * </p>' ) ;
-            res.write( '<img class="img_brd" id="imatge_webcam" width="320" height="240" src="data:image/png;base64,' ) ;
-            res.write( new Buffer(imatge).toString( 'base64' ) ) ;
-            res.end( '"/>' ) ;
+            if ( png_File.length > 1 ) {
+
+                try {
+
+                    var imatge = fs.readFileSync( png_File ) ;
+                    res.writeHead( 200, { 'Content-Type': 'text/html' } ) ;
+                    res.write( '<p> &nbsp; * pic id * </p>' ) ;
+                    res.write( '<img class="img_brd" id="imatge_webcam" width="320" height="240" src="data:image/png;base64,' ) ;
+                    res.write( new Buffer(imatge).toString( 'base64' ) ) ;
+                    res.end( '"/>' ) ; // tanca tag "<img"
+
+                } catch (err) {
+
+                    if (err.code === 'ENOENT') {
+                        console.log( '--- ENOENT : File not found at /fem_foto' ) ;
+                    } else {
+                        throw err;
+                    } ;
+
+                } ; // try fs.readFileSync()
+
+            } else {
+
+                res.writeHead( 200, { 'Content-Type': 'text/html' } ) ;
+                res.write( '<p> &nbsp; * pic error * </p>' ) ;
+                res.end( ) ;
+
+            } ; // lng > 1
+
         } ; // no error
 
     } ) ; // run PythonShell
@@ -264,4 +325,11 @@ var szResultatPhoto = "* PHOTO *" ;
 
 app.listen( app.get( 'cfgPort' ), () => {
     mConsole( szID ) ;
-} ) ;
+} ).on( 'error', function( err ) {
+    if ( err.errno === 'EADDRINUSE' ) { // catch port in use error
+        console.error( '--- port (' + app.get( 'cfgPort' ) + ') busy, process.exit() ---' );
+        process.exit() ;
+    } else {
+        console.log( err ) ;
+    } ;
+} ) ; // app.listen

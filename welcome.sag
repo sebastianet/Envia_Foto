@@ -1,5 +1,6 @@
 
 // git commands :
+//     git status                               display modified files
 //     git commit -am "version description"
 //     git config credential.helper store
 //     git push -u origin master
