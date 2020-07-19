@@ -5,7 +5,7 @@ var myTimer = 0 ;
 let kSeconds = 45 ;
 let cntPics = 0 ;
 
-let maxPics = 10 ;   // compte que index.htm ha de tenir els IDs corresponents ! img(320x240) en caben 5 ; img(160x120)  - 10 
+let maxPics = 10 ;   // compte que index.htm ha de tenir els IDs corresponents ! img(320x240) en caben 5 ; img(160x120) en caben 10 
 let idxPics = 0 ;
 let timBusy = 0 ;    // intentem controlar el retard del servidor ...
 
@@ -115,7 +115,7 @@ var szLog ;
         $( szIdClrPic ).attr( 'src', img_buida ) ;                                  // request "empty" pic and place it in page
 
         var szIdClrDate = '#idn_tmstmp_'+idxPics ;                                  // calculem el nom del lloc on posar el seguent texte
-        $( szIdClrDate ).html( '- - -' ) ;                                          // write timestamp in cell
+        $( szIdClrDate ).html( '- - -' ) ;                                          // write "empty" timestamp in cell
 
     }) ; // getJSON()
 

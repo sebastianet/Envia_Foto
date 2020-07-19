@@ -18,7 +18,10 @@ ipEXT=$(curl -s icanhazip.com);
 szIP="[`date -R`] external IP is {$ipEXT}. External port 8815, internal 2415/8080."
 echo $szIP                                                              >> $fTZ
 
+ps -ef | grep node | grep   -v grep                                     >> $fTZ
+
 # si ve de /etc/rc.local ja es ROOT
+# cd /home/sag/express-sendfile/
 /usr/bin/node /home/sag/express-sendfile/server.js                      >> $fTZ  2>&1      &
 rv=$?
 

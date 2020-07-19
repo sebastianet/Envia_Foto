@@ -1,22 +1,29 @@
 #!/usr/bin/env node
 
 // aquesta app de nodejs fa :
+//     escolta al port 2415 (definit al fitxer ".env")
 //     una foto 320x240 amb una webcam conectada al USB del raspberry i la envia en una pagina html
 //     una sequencia de fotos 160x120 - s'envia el nom del fitxer en un objecte JSON i el client el demana i posiciona
-//     si hi ha un error en fer la foto des python, el client demana "bio_hazard.png" - see /public/client.js
-//     despres de posar la foto a la pagina, es posa "webcam_160x120.png" a la casella seguent, esborrant la foto de la volta anterior
+//   si hi ha un error en fer la foto des python, el client demana "bio_hazard.png" - see /public/client.js
+//   despres de posar la foto a la pagina, es posa "webcam_160x120.png" a la casella seguent, esborrant la foto de la volta anterior
+//   la APP es accessible des Internet amb la IP del Router i el port 8815 (myraspiodin.hopto.org:8815)
+//
+// fitxers complementaris :
+//     ./public/client.js      codi JS que executa en el browser client
+//     ./public/index.htm      conte els identificadors dels camps on posem les fotos i el texte
 //
 // doc :
 //     https://docs.opencv.org/3.0-beta/modules/imgcodecs/doc/reading_and_writing_images.html
 //     https://github.com/extrabacon/python-shell
 //     https://www.npmjs.com/package/python-shell
 //
+// git repository : https://github.com/sebastianet/Envia_Foto
 // git commands :
 //     git commit -am "version description"
 //     git push -u origin master
-//     git repository : https://github.com/sebastianet/Envia_Foto
 //
 // pending :
+//     prevent multiple clients concurrently
 //     trace all express branches
 //     python error :
 //          rspi doesn't like old USB 1.1 webcams 
@@ -49,12 +56,13 @@
 //   1.1.w 20190614 - trace timeout at client, so python does not crash
 //   1.1.x 20190617 - catch ENOENT and EADDRINUSE 
 //   1.1.y 20200503 - improve some traces
+//   1.1.z 20200719 - locate .env properly from root
 //
 
 // les meves variables i constants
 // ================================
 
-var myVersio  = "1.1.y" ;
+var myVersio  = "1.1.z" ;
 var png_File  = '/home/sag/express-sendfile/public/imatges/webcam/fwc.png' ;  // created by python
 var Detalls   = 1 ;                                                           // control de la trassa que generem via "mConsole"
 
@@ -75,7 +83,8 @@ var sprintf      = require('sprintf-js').sprintf ;      // npm install sprintf-j
 // configuracio
 // =============
 
-require( 'dotenv' ).config() ;                          // npm install dotenv
+// require( 'dotenv' ).config() ;                          // npm install dotenv
+console.log( require( 'dotenv' ).config({path:__dirname+'/.env'}) ) ;
 
 app.set( 'cfgPort', process.env.PORT || '8080' ) ;
 app.set( 'cfgLapse_Gen_HTML', 60000 ) ;                 // mili-segons - gen HTML every ... 3 minuts = 180 segons = 180000 mSg

@@ -1,11 +1,19 @@
 
+// git repository : https://github.com/sebastianet/Envia_Foto
 // git commands :
 //     git status                               display modified files
 //     git commit -am "version description"
-//     git config credential.helper store
 //     git push -u origin master
-//     git repository : https://github.com/sebastianet/Envia_Foto
-
-// log file
+//     git config credential.helper store
+//
+// server log file 
 //     /home/sag/logs/photo_server.log
+// use F12 at client browser
 
+// error al browser client (F12):
+//  XML Parsing Error: not well-formed
+//  Location: http://myraspiodin.hopto.org:8815/fes_photo_gimme_json
+//  Line Number 1, Column 1:
+
+// error al DMESG del Rspi3 :
+//  gspca_zc3xx 1-1.2:1.0: URB error -32, resubmitting

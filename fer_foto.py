@@ -41,7 +41,7 @@ if ( numArg > 1 ) :                       # if we have parameter
 
 szFN = '/home/sag/express-sendfile/public/' + szShortFN     # this is the full name
 # print 'Large Filename (' + szFN + ').'
-szReturnArray = '.'                                # default return value for node, indicating "no pic"
+szReturnArray = '. no pic .'                                # default return value for node, indicating "no pic"
 
 # print '>>> do VideoCapture()'
 cap = cv2.VideoCapture( 0 ) 
@@ -56,6 +56,7 @@ if not cap.isOpened() :
 
 # try using own values
 # print '>>> set W 320, H 240.'
+# print '>>> set W 160, H 120.'
 cap.set( cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 160 )     # 1280 1024 800 640 320 ?160
 cap.set( cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 120 )    # 1024  800 600 480 240 ?120
 # cv2.waitKey( 3000 )
@@ -70,7 +71,7 @@ if ( cap.isOpened() ):
 
             if ( count == 4 ):
                 cv2.imwrite ( szFN, frame )
-                szReturnArray = szFN                   # set return parameter for NODE, indicating "pic"
+                szReturnArray = szFN                   # set return parameter for NODE, indicating "pic" filename
         
         else:
             szReturnArray = '--- VideoCapture::read no ha anat be'
